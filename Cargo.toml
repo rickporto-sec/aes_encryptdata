@@ -1,0 +1,16 @@
+[package]
+name = "aes_cryptodata"
+version = "0.1.0"
+edition = "2021"
+authors = ["<rickporto.sec@gmail.com>"]
+
+[dependencies]
+openssl = "0.10"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1 
+panic = "abort"
+incremental = false
+debug = false
